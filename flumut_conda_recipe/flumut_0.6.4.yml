@@ -1,0 +1,8 @@
+name: flumut_0.6.4
+channels:
+ - bioconda
+ - conda-forge
+ - defaults
+dependencies:
+ - python=3.13 
+ - flumut=0.6.4
