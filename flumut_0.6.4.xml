@@ -9,7 +9,7 @@
             </xrefs>
         </xml>
 
-        <?ignore <text> FIXME did not set any macro in bio_tools so .. </text> ?>
+        <!-- FIXME did not set any macro in bio_tools so .. -->
         
         <import>flumut_macros.xml</import>
 
@@ -67,26 +67,21 @@
                         <option value="yes">Relaxed option (at least one mutation is found)</option>
             </param>
             <when value="no"></when>
+            
             <when value="yes">
-                <?ignore <text>The --relaxed flag is added in the command block </text>?>
+                <!--The relaxed flag is added in the command block -->
             </when>
         </conditional>
 
         
-        <?ignore <text> FIXME Optional database path if not default </text> ?>
+        <-- FIXME Optional database path if not default -->
         <param name="db_file" type="data" format="unknwon" optional="true" label="Set alternative source database (optional)" help="Provide an alternative FluMut database. If not provided, the default database will be used."/>
 
-        <?ignore
-            <text>
-                FIXME eventually set ability to parse sequences:
-                -n, --name-regex TEXT           Set regular expression to parse sequence name.  [default: (?P<sample>.+)_(?P<segment>.+)]
-                --skip-unmatch-names            Skip sequences with name that does not match the regular expression pattern.
-                --skip-unknown-segments         Skip sequences with segment not present in  the database.
-            </text>
-        ?> 
-
-   
-
+        <!-- FIXME eventually set ability to parse sequences:
+                name-regex TEXT               Set regular expression to parse sequence name.  [default: (?P<sample>.+)_(?P<segment>.+)]
+                skip-unmatch-names            Skip sequences with name that does not match the regular expression pattern.
+                skip-unknown-segments         Skip sequences with segment not present in  the database.
+        -->
 
     </inputs>
 
