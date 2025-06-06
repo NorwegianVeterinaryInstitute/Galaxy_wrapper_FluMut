@@ -16,6 +16,7 @@ conda env create -f flumut_0.6.4.yml
 
 conda activate flumut_0.6.4
 cd test 
+# flumut --update
 # flumut -x test.xlsm EPI_ISL_18933204.fasta
 flumut -m markers_output.tsv -M mutations_output.tsv -l literature_output.tsv EPI_ISL_18933204.fasta
 conda deactivate

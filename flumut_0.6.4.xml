@@ -1,0 +1,167 @@
+<tool id="flumut" name="flumut" version="@TOOL_VERSION@+galaxy@VERSION_SUFFIX@" python_template_version="3.5" profile="21.09">
+   <description>FluMut is an open-source tool designed to search for molecular markers with potential impact on the biological characteristics of Influenza A viruses of the A(H5N1) subtype, starting from complete or partial nucleotide genome sequences.
+        This software is developped by the EURL.</description>
+
+    <macros>
+        <xml name="bio_tools">
+            <xrefs>
+                <xref type="bio.tools">flumut</xref>
+            </xrefs>
+        </xml>
+
+        <?ignore <text> FIXME did not set any macro in bio_tools so .. </text> ?>
+        
+        <import>flumut_macros.xml</import>
+
+        <token name="@TOOL_VERSION@">0.6.4</token>
+        <token name="@VERSION_SUFFIX@">1</token>
+
+        <token name="@INPUT@">
+            <param name="input_file" type="data" format="fasta" label="Select input file" help="Virus genome. Headers must have been parsed. See FluMut manual."/>
+        </token>           
+    </macros>
+
+    <requirements>
+        <requirement type="package" version="@TOOL_VERSION@">flumut</requirement>
+    </requirements>
+
+
+    <command detect_errors="exit_code"><![CDATA[
+        ## Consider updating flumut? but cant be automatic !FIXME (maintenance note)
+        ## flumut --update
+
+        #set $optional_args = ""
+        #if $optional_relaxed.relaxed == "yes":
+            #set $optional_args += " --relaxed"
+        #end if
+
+        #if $db_file:
+            #set $optional_args += " --db-file '$db_file'"
+        #end if
+
+        flumut
+            $optional_args
+            #if $output_format.value == "tsv":
+                -m '$markers_output'
+                -M '$mutations_output'
+                -l '$literature_output'
+            #else:
+                -x '$excel_output'
+            #end if
+            '$input_file'
+        #end if
+    ]]>
+    </command>
+
+    <inputs>
+        <expand macro="INPUT"/>
+        <param name="output_format" type="select" label="Select the output format">
+            <option value="tsv" selected="true">Tabular (TSV)</option>
+            <option value="excel">Excel (XLSX)</option>
+        </param>
+
+
+        <conditional name="optional_relaxed">
+            <param name="relaxed" type="select" label="Report only markers where all mutations are found (default) or where at least one mutation is found">
+                        <option value="no" selected="true">Default (report markers were all mutations are found)</option>
+                        <option value="yes">Relaxed option (at least one mutation is found)</option>
+            </param>
+            <when value="no"></when>
+            <when value="yes">
+                <?ignore <text>The --relaxed flag is added in the command block </text>?>
+            </when>
+        </conditional>
+
+        
+        <?ignore <text> FIXME Optional database path if not default </text> ?>
+        <param name="db_file" type="data" format="unknwon" optional="true" label="Set alternative source database (optional)" help="Provide an alternative FluMut database. If not provided, the default database will be used."/>
+
+        <?ignore
+            <text>
+                FIXME eventually set ability to parse sequences:
+                -n, --name-regex TEXT           Set regular expression to parse sequence name.  [default: (?P<sample>.+)_(?P<segment>.+)]
+                --skip-unmatch-names            Skip sequences with name that does not match the regular expression pattern.
+                --skip-unknown-segments         Skip sequences with segment not present in  the database.
+            </text>
+        ?> 
+
+   
+
+
+    </inputs>
+
+
+    <outputs>
+        <conditional name="output_format">
+            <when value="tsv">
+                <data name="markers_output" format="tabular" label="FluMut markers Output (TSV)"/>
+                <data name="mutations_output" format="tabular" label="FluMut mutations Output (TSV)"/>
+                <data name="literature_output" format="tabular" label="Flumut literature Output (TSV)"/>
+            </when>
+            <when value="excel">
+                <data name="excel_output" format="xlsx" label="Flumut Excel format Output (XLSX)"/>
+            </when>
+    </conditional>
+
+    </outputs>
+
+    <tests>
+        <test expect_num_outputs="1">
+            <param name="input_file" value="test_input.fasta"/>
+            <param name="output_format" value="excel"/>
+            <output name="excel_output" file="test_output_excel.xlsx" />
+        </test>
+        <test expect_num_outputs="3">
+            <param name="input_file" value="test_input.fasta"/>
+            <param name="output_format" value="tsv"/>
+            <output name="markers_output" file="test_markers_output.tsv"/>
+            <output name="mutations_output" file="test_mutations_output.tsv"/>
+            <output name="literature_output" file="test_literature_output"/>   
+        </test>
+    </tests>
+    
+    
+    <help><![CDATA[
+        The input file must be a FASTA file with headers that have been parsed correctly.
+        >any_text|any_string/seq_name_PB1 - it is important that the name of the segment is at the end of the header, after a _.
+
+        The relaxed option (--relaxed) Report markers of which at least one mutation is found.
+        
+        An alternat source database source can be provided (--db-file), if not provided the default FluMut database will be used.
+    ]]></help>
+
+    <citations>
+        <citation type="bibtex">
+            @misc{Flumu_webpage, 
+            howpublished = {\url{https://izsvenezie-virology.github.io/FluMut/},
+            }
+        </citation>
+        <citation type="bibtex">
+            @misc{FluMut_repository,
+            url = {https://github.com/izsvenezie-virology/FluMut},
+            }
+        </citation>
+        <citation type="bibtex">
+            @article{10.1093/ve/veaf011,
+                author = {Giussani, Edoardo and Sartori, Alessandro and Salomoni, Angela and Cavicchio, Lara and de Battisti, Cristian and Pastori, Ambra and Varotto, Maria and Zecchin, Bianca and Hughes, Joseph and Monne, Isabella and Fusaro, Alice},
+                title = {FluMut: a tool for mutation surveillance in highly pathogenic H5N1 genomes},
+                journal = {Virus Evolution},
+                volume = {11},
+                number = {1},
+                pages = {veaf011},
+                year = {2025},
+                month = {03},
+                abstract = {Over the past century, Influenza A virus (IAV) has caused four of the five reported pandemics, all of which originated from viruses possessing genome segments of avian origin. The recent spread of highly pathogenic avian influenza (HPAI) viruses, particularly the clade 2.3.4.4b A(H5N1) subtype, has led to an alarming increase in mammalian infections, raising concerns about the potential for future pandemics. In response to this, we developed FluMut, an open-source, cross-platform tool designed to identify molecular markers with potential impacts on H5N1 virus phenotypes. FluMut leverages an up-to-date database, FluMutDB, to rapidly analyze thousands of nucleotide sequences, identifying mutations associated with host adaptation, increased virulence, and antiviral resistance. The tool is available both as a command-line interface and a user-friendly graphical interface, making it accessible to researchers with varying levels of computational expertise. FluMut provides comprehensive outputs, including tables of detected markers, their biological effects, and corresponding literature references. This tool fills a critical gap in the genomic surveillance of HPAI H5N1, facilitating real-time monitoring of viral evolution and aiding in the identification of mutations that may signal increased pandemic potential. Future updates will extend FluMut’s capabilities to other influenza subtypes.},
+                issn = {2057-1577},
+                doi = {10.1093/ve/veaf011},
+                url = {https://doi.org/10.1093/ve/veaf011},
+                eprint = {https://academic.oup.com/ve/article-pdf/11/1/veaf011/62340051/veaf011.pdf},
+
+            }
+        </citation>
+    </citations>
+
+</tool>
+
+
+
